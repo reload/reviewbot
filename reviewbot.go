@@ -29,6 +29,10 @@ func run() {
 		panic(err)
 	}
 
+	if count <= 0 {
+		return
+	}
+
 	str, err := format(edges, count)
 
 	if err != nil {
