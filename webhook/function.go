@@ -67,12 +67,13 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	str := fmt.Sprintf(
-		"Review requested by `%s`:\n\n * %s#%d: [**%s**](%s)",
-		pullRequest.PullRequest.User.Login,
+		"Review requested by `%s`:\n\n * %s#%d: [**%s**](%s) by `%s`",
+		pullRequest.Sender.Login,
 		pullRequest.Repository.FullName,
 		pullRequest.Number,
 		pullRequest.PullRequest.Title,
 		pullRequest.PullRequest.HTMLURL,
+		pullRequest.PullRequest.User.Login,
 	)
 
 	err = flowpost(str)
