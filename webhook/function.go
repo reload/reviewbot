@@ -38,7 +38,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	hook, _ := github.New(github.Options.Secret(githubSecret))
-	payload, err := hook.Parse(r, github.PullRequestEvent)
+	payload, err := hook.Parse(r, github.PullRequestEvent, github.PingEvent)
 
 	if err == github.ErrMissingHubSignatureHeader {
 		http.Error(w, fmt.Sprintf("%s: %s", http.StatusText(http.StatusUnauthorized), err), http.StatusUnauthorized)
@@ -48,6 +48,12 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 
 	if err != nil {
 		http.Error(w, fmt.Sprintf("%s: %s", http.StatusText(http.StatusBadRequest), err), http.StatusBadRequest)
+
+		return
+	}
+
+	if _, ok := payload.(github.PingPayload); ok {
+		http.Error(w, "Pong", http.StatusOK)
 
 		return
 	}
