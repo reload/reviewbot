@@ -52,7 +52,13 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	pullRequest := payload.(github.PullRequestPayload)
+	pullRequest, ok := payload.(github.PullRequestPayload)
+
+	if !ok {
+		http.Error(w, fmt.Sprintf("Could not parse as pull request payload: %#v", payload), http.StatusBadRequest)
+
+		return
+	}
 
 	if pullRequest.Action != "review_requested" {
 		http.Error(w, "Not a review request", http.StatusOK)
