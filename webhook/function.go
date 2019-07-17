@@ -5,7 +5,9 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 
+	"github.com/rickar/cal"
 	"github.com/wm/go-flowdock/flowdock"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
@@ -88,6 +90,10 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		pullRequest.PullRequest.User.Login,
 	)
 
+	if withinWorkingHours() {
+		str = fmt.Sprintf("@team, %s", str)
+	}
+
 	err = flowpost(str)
 
 	if err != nil {
@@ -142,4 +148,31 @@ func flowpost(msg string) error {
 	})
 
 	return err
+}
+
+func withinWorkingHours() bool {
+	c := workCalendar()
+	now := time.Now()
+
+	if !c.IsWorkday(now) {
+		return false
+	}
+
+	if (now.Hour() < 8) || (now.Hour() > 17) {
+		return false
+	}
+
+	return true
+}
+
+func workCalendar() *cal.Calendar {
+	c := cal.NewCalendar()
+
+	cal.AddDanishHolidays(c)
+	c.AddHoliday(
+		cal.DKJuleaften,
+		cal.DKNytaarsaften,
+	)
+
+	return c
 }
