@@ -1,4 +1,4 @@
-module arnested.dk/go/reviewbot
+module github.com/reload/reviewbot
 
 go 1.12
 
