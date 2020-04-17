@@ -7,7 +7,7 @@ require (
 	github.com/golang/protobuf v1.3.1 // indirect
 	github.com/google/go-querystring v1.0.0 // indirect
 	github.com/martinusso/inflect v0.0.0-20161215184957-e234d1ee70de
-	github.com/rickar/cal v1.0.3
+	github.com/rickar/cal v1.0.5
 	github.com/robfig/cron v1.2.0
 	github.com/shurcooL/githubv4 v0.0.0-20190119021625-d9689b595017
 	github.com/shurcooL/graphql v0.0.0-20181231061246-d48a9a75455f // indirect
