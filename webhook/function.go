@@ -5,10 +5,11 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/containrrr/shoutrrr"
 	"github.com/rickar/cal"
-	"github.com/wm/go-flowdock/flowdock"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
 
@@ -81,7 +82,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	str := fmt.Sprintf(
-		"Review requested by `%s`:\n\n * %s#%d: [**%s**](%s) by `%s`",
+		"Review requested by `%s`:\n\n * %s#%d: **[%s](%s)** by `%s`",
 		pullRequest.Sender.Login,
 		pullRequest.Repository.FullName,
 		pullRequest.Number,
@@ -91,14 +92,14 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if withinWorkingHours() {
-		str = fmt.Sprintf("@team, %s", str)
+		str = fmt.Sprintf("@all, %s", str)
 	}
 
-	err = flowpost(str)
+	err = send(str)
 
 	if err != nil {
-		log.Printf("Could not post to Flowdock: %s", err)
-		http.Error(w, fmt.Sprintf("Could not post to Flowdock: %s", err), http.StatusInternalServerError)
+		log.Printf("Could not post message: %s", err)
+		http.Error(w, fmt.Sprintf("Could not post message: %s", err), http.StatusInternalServerError)
 
 		return
 	}
@@ -108,46 +109,21 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func flowpost(msg string) error {
-	flowname, ok := os.LookupEnv("FLOWDOCK_FLOW_NAME")
-
-	if !ok {
-		return fmt.Errorf("No Flowdock flow name configured (environment variable FLOWDOCK_FLOW_NAME)")
-	}
-
-	flowdockToken, ok := os.LookupEnv("FLOWDOCK_TOKEN")
-
-	if !ok {
-		return fmt.Errorf("No Flowdock token configured (environment variable FLOWDOCK_TOKEN)")
-	}
-
-	client := flowdock.NewClientWithToken(nil, flowdockToken)
-
-	flows, _, err := client.Flows.List(true, &flowdock.FlowsListOptions{User: false})
+func send(message string) error {
+	services := os.Getenv("NOTIFY")
+	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 
 	if err != nil {
-		return err
+		return fmt.Errorf("Error creating notification sender(s): %s", err.Error())
 	}
 
-	flowID := ""
-	for _, f := range flows {
-		if *f.ParameterizedName == flowname {
-			flowID = *f.Id
-		}
+	errs := notify.Send(message, nil)
+
+	if len(errs) > 0 {
+		return fmt.Errorf("Error creating notification sender(s): %v", errs)
 	}
 
-	if flowID == "" {
-		return fmt.Errorf("Could not find flow named %s", flowname)
-	}
-
-	_, _, err = client.Messages.Create(&flowdock.MessagesCreateOptions{
-		Event:            "message",
-		FlowID:           flowID,
-		Content:          msg,
-		ExternalUserName: "ReviewBot",
-	})
-
-	return err
+	return nil
 }
 
 func withinWorkingHours() bool {
