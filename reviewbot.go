@@ -1,12 +1,14 @@
 package main
 
 import (
+	"fmt"
 	"os"
+	"strings"
 	"time"
 
+	"github.com/containrrr/shoutrrr"
 	"github.com/rickar/cal"
 	"github.com/robfig/cron"
-	"github.com/wm/go-flowdock/flowdock"
 )
 
 func main() {
@@ -39,7 +41,7 @@ func run() {
 		panic(err)
 	}
 
-	err = flowpost(str)
+	err = send(str)
 
 	if err != nil {
 		panic(err)
@@ -58,35 +60,19 @@ func workCalendar() *cal.Calendar {
 	return c
 }
 
-func flowpost(str string) error {
-	flowname := os.Getenv("FLOWDOCK_FLOW")
-
-	client := flowdock.NewClientWithToken(nil, os.Getenv("FLOWDOCK_API_TOKEN"))
-
-	flows, _, err := client.Flows.List(true, &flowdock.FlowsListOptions{User: false})
+func send(message string) error {
+	services := os.Getenv("NOTIFY")
+	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 
 	if err != nil {
-		panic(err)
+		return fmt.Errorf("Error creating notification sender(s): %s", err.Error())
 	}
 
-	flowID := ""
-	for _, f := range flows {
-		if *f.ParameterizedName == flowname {
-			flowID = *f.Id
-		}
+	errs := notify.Send(message, nil)
+
+	if len(errs) > 0 {
+		return fmt.Errorf("Error creating notification sender(s): %v", errs)
 	}
 
-	if flowID == "" {
-		panic("Could not find flow.")
-	}
-
-	_, _, err = client.Messages.Create(&flowdock.MessagesCreateOptions{
-		Event:            "message",
-		FlowID:           flowID,
-		Tags:             []string{"@team"},
-		Content:          str,
-		ExternalUserName: "ReviewBot",
-	})
-
-	return err
+	return nil
 }

@@ -17,13 +17,13 @@ func format(edges []edge, count int) (string, error) {
 		return buf.String(), nil
 
 	case count == 1:
-		fmt.Fprintf(buf, "@team, %s issue needs review:\n", inflect.IntoWords(float64(count)))
+		fmt.Fprintf(buf, "@all, %s issue needs review:\n", inflect.IntoWords(float64(count)))
 
 	default:
-		fmt.Fprintf(buf, "@team, %s issues needs review:\n", inflect.IntoWords(float64(count)))
+		fmt.Fprintf(buf, "@all, %s issues needs review:\n", inflect.IntoWords(float64(count)))
 	}
 
-	tmpl, err := template.New("pr").Parse("\n * {{.Repository.NameWithOwner}}#{{.Number}}: [**{{.Title}}**]({{.URL}})")
+	tmpl, err := template.New("pr").Parse("\n * {{.Repository.NameWithOwner}}#{{.Number}}: **[{{.Title}}]({{.URL}})**")
 
 	if err != nil {
 		return buf.String(), err

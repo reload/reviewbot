@@ -3,7 +3,7 @@
 NAME=ReviewBot-webhook
 ENTRY_POINT=Handle
 REGION=europe-west1
-RUNTIME=go111
+RUNTIME=go113
 
 export GO111MODULE=on
 
