@@ -92,7 +92,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	)
 
 	if withinWorkingHours() {
-		str = fmt.Sprintf("@all, %s", str)
+		str = fmt.Sprintf("@**all**, %s", str)
 	}
 
 	err = send(str)
