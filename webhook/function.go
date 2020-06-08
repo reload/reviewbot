@@ -9,6 +9,7 @@ import (
 	"time"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/rickar/cal"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
@@ -95,7 +96,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		str = fmt.Sprintf("@**all**, %s", str)
 	}
 
-	err = send(str)
+	err = send(str, pullRequest.Repository.FullName)
 
 	if err != nil {
 		log.Printf("Could not post message: %s", err)
@@ -109,7 +110,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	return
 }
 
-func send(message string) error {
+func send(message string, topic string) error {
 	services := os.Getenv("NOTIFY")
 	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 
@@ -117,7 +118,11 @@ func send(message string) error {
 		return fmt.Errorf("Error creating notification sender(s): %s", err.Error())
 	}
 
-	errs := notify.Send(message, nil)
+	params := types.Params{
+		"topic": topic,
+	}
+
+	errs := notify.Send(message, &params)
 
 	if len(errs) > 0 {
 		return fmt.Errorf("Error creating notification sender(s): %v", errs)
