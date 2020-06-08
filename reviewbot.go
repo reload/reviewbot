@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/containrrr/shoutrrr"
+	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/rickar/cal"
 	"github.com/robfig/cron"
 )
@@ -68,7 +69,12 @@ func send(message string) error {
 		return fmt.Errorf("Error creating notification sender(s): %s", err.Error())
 	}
 
-	errs := notify.Send(message, nil)
+	t := time.Now()
+	params := types.Params{
+		"topic": fmt.Sprintf("%d-%02d-%02d", t.Year(), t.Month(), t.Day()),
+	}
+
+	errs := notify.Send(message, &params)
 
 	if len(errs) > 0 {
 		return fmt.Errorf("Error creating notification sender(s): %v", errs)
