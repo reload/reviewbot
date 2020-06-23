@@ -66,7 +66,7 @@ func send(message string) error {
 	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 
 	if err != nil {
-		return fmt.Errorf("Error creating notification sender(s): %s", err.Error())
+		return fmt.Errorf("error creating notification sender(s): %w", err)
 	}
 
 	t := time.Now()
@@ -77,7 +77,7 @@ func send(message string) error {
 	errs := notify.Send(message, &params)
 
 	if len(errs) > 0 {
-		return fmt.Errorf("Error creating notification sender(s): %v", errs)
+		return fmt.Errorf("error creating notification sender(s): %v", errs) //nolint:goerr113
 	}
 
 	return nil
