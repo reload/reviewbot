@@ -1,6 +1,7 @@
 package function
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"net/http"
@@ -16,15 +17,10 @@ import (
 
 // Handle is the entrypoint for the Google Cloud Function.
 func Handle(w http.ResponseWriter, r *http.Request) {
-	// We log to Google Cloud Functions and don't need a timestamp
-	// since it will be present in the log anyway. On the other
-	// hand a reference to file and line number would be nice.
 	log.SetFlags(log.Lshortfile)
-
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 
 	githubSecret, ok := os.LookupEnv("GITHUB_SECRET")
-
 	if !ok {
 		log.Printf("No GitHub secret defined (environment variable GITHUB_SECRET)")
 		http.Error(w, "No GitHub secret defined (environment variable GITHUB_SECRET)", http.StatusInternalServerError)
@@ -33,7 +29,6 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	teamSlug, ok := os.LookupEnv("GITHUB_TEAM_SLUG")
-
 	if !ok {
 		log.Printf("No GitHub team ID defined (environment variable GITHUB_TEAM_ID)")
 		http.Error(w, "No GitHub team ID defined (environment variable GITHUB_TEAM_ID)", http.StatusInternalServerError)
@@ -44,7 +39,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	hook, _ := github.New(github.Options.Secret(githubSecret))
 	payload, err := hook.Parse(r, github.PullRequestEvent, github.PingEvent)
 
-	if err == github.ErrMissingHubSignatureHeader {
+	if errors.Is(err, github.ErrMissingHubSignatureHeader) {
 		http.Error(w, fmt.Sprintf("%s: %s", http.StatusText(http.StatusUnauthorized), err), http.StatusUnauthorized)
 
 		return
@@ -63,7 +58,6 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	pullRequest, ok := payload.(github.PullRequestPayload)
-
 	if !ok {
 		http.Error(w, fmt.Sprintf("Could not parse as pull request payload: %#v", payload), http.StatusBadRequest)
 
@@ -82,6 +76,10 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	sendMessage(w, pullRequest)
+}
+
+func sendMessage(w http.ResponseWriter, pullRequest github.PullRequestPayload) {
 	str := fmt.Sprintf(
 		"Review requested by `%s`:\n\n * %s#%d: **[%s](%s)** by `%s`",
 		pullRequest.Sender.Login,
@@ -96,8 +94,7 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 		str = fmt.Sprintf("@**all**, %s", str)
 	}
 
-	err = send(str, pullRequest.Repository.FullName)
-
+	err := send(str, pullRequest.Repository.FullName)
 	if err != nil {
 		log.Printf("Could not post message: %s", err)
 		http.Error(w, fmt.Sprintf("Could not post message: %s", err), http.StatusInternalServerError)
@@ -106,8 +103,6 @@ func Handle(w http.ResponseWriter, r *http.Request) {
 	}
 
 	http.Error(w, str, http.StatusOK)
-
-	return
 }
 
 func send(message string, topic string) error {
@@ -115,7 +110,7 @@ func send(message string, topic string) error {
 	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 
 	if err != nil {
-		return fmt.Errorf("Error creating notification sender(s): %s", err.Error())
+		return fmt.Errorf("error creating notification sender(s): %w", err)
 	}
 
 	params := types.Params{
@@ -125,7 +120,7 @@ func send(message string, topic string) error {
 	errs := notify.Send(message, &params)
 
 	if len(errs) > 0 {
-		return fmt.Errorf("Error creating notification sender(s): %v", errs)
+		return fmt.Errorf("error creating notification sender(s): %v", errs) //nolint:goerr113
 	}
 
 	return nil
