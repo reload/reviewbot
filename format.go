@@ -13,14 +13,14 @@ func format(edges []edge, count int) (string, error) {
 
 	switch {
 	case count <= 0:
-		fmt.Fprintf(buf, "No issues needs review.\n")
+		fmt.Fprintf(buf, "No pull requests needs review.\n")
 		return buf.String(), nil
 
 	case count == 1:
-		fmt.Fprintf(buf, "@**all**, %s issue needs review:\n", inflect.IntoWords(float64(count)))
+		fmt.Fprintf(buf, "@**all**, %s pull request needs review:\n", inflect.IntoWords(float64(count)))
 
 	default:
-		fmt.Fprintf(buf, "@**all**, %s issues needs review:\n", inflect.IntoWords(float64(count)))
+		fmt.Fprintf(buf, "@**all**, %s pull requests needs review:\n", inflect.IntoWords(float64(count)))
 	}
 
 	tmpl, err := template.New("pr").Parse("\n * {{.Repository.NameWithOwner}}#{{.Number}}: **[{{.Title}}]({{.URL}})**")
