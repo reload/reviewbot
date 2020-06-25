@@ -134,7 +134,7 @@ func withinWorkingHours() bool {
 		return false
 	}
 
-	if (now.Hour() < 8) || (now.Hour() > 17) {
+	if (now.Hour() < 9) || (now.Hour() > 16) {
 		return false
 	}
 
