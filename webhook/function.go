@@ -107,8 +107,8 @@ func sendMessage(w http.ResponseWriter, pullRequest github.PullRequestPayload) {
 
 func send(message string, topic string) error {
 	services := os.Getenv("NOTIFY")
-	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 
+	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 	if err != nil {
 		return fmt.Errorf("error creating notification sender(s): %w", err)
 	}
@@ -119,8 +119,8 @@ func send(message string, topic string) error {
 
 	errs := notify.Send(message, &params)
 
-	if len(errs) > 0 {
-		return fmt.Errorf("error creating notification sender(s): %v", errs) //nolint:goerr113
+	if countErrors(errs) > 0 {
+		return fmt.Errorf("error(s) sending message: %v", errs) //nolint:goerr113
 	}
 
 	return nil
@@ -151,4 +151,17 @@ func workCalendar() *cal.Calendar {
 	)
 
 	return c
+}
+
+// countErrors but not nils.
+func countErrors(slice []error) int {
+	i := 0
+
+	for _, elem := range slice {
+		if elem != nil {
+			i++
+		}
+	}
+
+	return i
 }
