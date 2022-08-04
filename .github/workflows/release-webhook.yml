@@ -31,7 +31,7 @@ jobs:
         project_id: ${{ secrets.CF_PROJECT }}
         runtime: ${{ steps.runtime.outputs.go-runtime }}
         entry_point: "Handle"
-        env_vars: GITHUB_SECRET=${{ secrets.GITHUB_SECRET }},GITHUB_SECRET=${{ secrets.SHARED_SECRET }},GITHUB_TEAM_SLUG=${{ secrets.TEAM_SLUG }},NOTIFY=${{ secrets.NOTIFY }},TZ=Europe/Copenhagen
+        env_vars: GITHUB_SECRET=${{ secrets.SHARED_SECRET }},GITHUB_TEAM_SLUG=${{ secrets.TEAM_SLUG }},NOTIFY=${{ secrets.NOTIFY }},TZ=Europe/Copenhagen
     - name: Post status to Zulip
       if: ${{ always() }}
       uses: containrrr/shoutrrr-action@v1
