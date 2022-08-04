@@ -8,7 +8,8 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/rickar/cal"
+	"github.com/rickar/cal/v2"
+	"github.com/rickar/cal/v2/dk"
 	"github.com/robfig/cron"
 )
 
@@ -27,7 +28,6 @@ func run() {
 	}
 
 	edges, count, err := reviewRequests()
-
 	if err != nil {
 		panic(err)
 	}
@@ -37,7 +37,6 @@ func run() {
 	}
 
 	str, err := format(edges, count)
-
 	if err != nil {
 		panic(err)
 	}
@@ -49,22 +48,32 @@ func run() {
 	}
 }
 
-func workCalendar() *cal.Calendar {
-	c := cal.NewCalendar()
+func workCalendar() *cal.BusinessCalendar {
+	c := cal.NewBusinessCalendar()
 
-	cal.AddDanishHolidays(c)
-	c.AddHoliday(
-		cal.DKJuleaften,
-		cal.DKNytaarsaften,
-	)
+	c.AddHoliday(dk.Holidays...)
+
+	//nolint:exhaustivestruct
+	c.AddHoliday(&cal.Holiday{
+		Month: time.December,
+		Day:   24, //nolint:gomnd
+		Func:  cal.CalcDayOfMonth,
+	})
+
+	//nolint:exhaustivestruct
+	c.AddHoliday(&cal.Holiday{
+		Month: time.December,
+		Day:   31, //nolint:gomnd
+		Func:  cal.CalcDayOfMonth,
+	})
 
 	return c
 }
 
 func send(message string) error {
 	services := os.Getenv("NOTIFY")
-	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 
+	notify, err := shoutrrr.CreateSender(strings.Split(services, ",")...)
 	if err != nil {
 		return fmt.Errorf("error creating notification sender(s): %w", err)
 	}
