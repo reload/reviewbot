@@ -1,0 +1,26 @@
+on: push
+name: Build and test
+
+permissions:
+  contents: read
+
+jobs:
+  build_and_test:
+    name: Build and test
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: arnested/go-version-action@v1
+      id: version
+      with:
+        working-directory: webhook
+    - name: Setup Go ${{ steps.version.outputs.go-mod-version }}.x
+      uses: WillAbides/setup-go-faster@v1.7.0
+      with:
+        go-version: ${{ steps.version.outputs.go-mod-version }}.x
+        ignore-local: true
+    - name: go test
+      working-directory: webhook
+      env:
+        GO111MODULE: 'on'
+      run: go test --verbose -race -cover -covermode=atomic ./...
