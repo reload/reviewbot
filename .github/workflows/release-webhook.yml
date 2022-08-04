@@ -38,5 +38,5 @@ jobs:
       if: ${{ always() }}
       uses: containrrr/shoutrrr-action@v1
       with:
-        url: "${{ secrets.ZULIP_SHOUTRRR_URL }}?stream=logs&topic=dnssec"
+        url: "${{ secrets.ZULIP_SHOUTRRR_URL }}?stream=logs&topic=reviewbot"
         message: "Deployed `${{ github.repository }}`@`${{ github.sha }}` to Google Cloud Function `${{ secrets.CF_NAME }}`@`${{ secrets.CF_PROJECT }}`: **${{ job.status }}**."
