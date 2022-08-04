@@ -33,7 +33,9 @@ jobs:
         runtime: ${{ steps.runtime.outputs.go-runtime }}
         entry_point: "Handle"
         env_vars: GITHUB_SECRET=${{ secrets.SHARED_SECRET }},GITHUB_TEAM_SLUG=${{ secrets.TEAM_SLUG }},NOTIFY=${{ secrets.NOTIFY }},TZ=Europe/Copenhagen
+        description: ${{ github.repository }}
         https_trigger_security_level: secure_always
+        memory_mb: 128
     - name: Post status to Zulip
       if: ${{ always() }}
       uses: containrrr/shoutrrr-action@v1
