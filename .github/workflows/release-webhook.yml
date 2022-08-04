@@ -1,0 +1,40 @@
+name: Release
+on:
+  workflow_run:
+    workflows: ["Build and test"]
+    branches: [main]
+    types:
+      - completed
+
+permissions:
+  contents: read
+  actions: read
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v3
+    - uses: arnested/go-version-action@v1
+      id: version
+    - run: echo ::set-output name=go-runtime::$(echo -n go${{ steps.version.outputs.go-mod-version }} | tr -d '.')
+      working-directory: webhook
+      id: runtime
+    - uses: google-github-actions/auth@v0
+      with:
+        credentials_json: '${{ secrets.GCLOUD_AUTH }}'
+    - uses: google-github-actions/deploy-cloud-functions@v0
+      with:
+        source_dir: webhook
+        name: ${{ secrets.CF_NAME }}
+        region: ${{ secrets.CF_REGION }}
+        project_id: ${{ secrets.CF_PROJECT }}
+        runtime: ${{ steps.runtime.outputs.go-runtime }}
+        entry_point: "Handle"
+        env_vars: GITHUB_SECRET=${{ secrets.GITHUB_SECRET }},GITHUB_SECRET=${{ secrets.SHARED_SECRET }},GITHUB_TEAM_SLUG=${{ secrets.TEAM_SLUG }},NOTIFY=${{ secrets.NOTIFY }},TZ=Europe/Copenhagen
+    - name: Post status to Zulip
+      if: ${{ always() }}
+      uses: containrrr/shoutrrr-action@v1
+      with:
+        url: "${{ secrets.ZULIP_SHOUTRRR_URL }}?stream=logs&topic=dnssec"
+        message: "Deployed `${{ github.repository }}`@`${{ github.sha }}` to Google Cloud Function `${{ secrets.CF_NAME }}`@`${{ secrets.CF_PROJECT }}`: **${{ job.status }}**."
