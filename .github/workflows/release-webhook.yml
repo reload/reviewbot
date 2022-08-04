@@ -1,4 +1,4 @@
-name: Release
+name: Release Webhook
 on:
   workflow_run:
     workflows: ["Build and test"]
@@ -26,13 +26,14 @@ jobs:
         credentials_json: '${{ secrets.GCLOUD_AUTH }}'
     - uses: google-github-actions/deploy-cloud-functions@v0
       with:
-        source_dir: webhook
+        source_dir: ./webhook/
         name: ${{ secrets.CF_NAME }}
         region: ${{ secrets.CF_REGION }}
         project_id: ${{ secrets.CF_PROJECT }}
         runtime: ${{ steps.runtime.outputs.go-runtime }}
         entry_point: "Handle"
         env_vars: GITHUB_SECRET=${{ secrets.SHARED_SECRET }},GITHUB_TEAM_SLUG=${{ secrets.TEAM_SLUG }},NOTIFY=${{ secrets.NOTIFY }},TZ=Europe/Copenhagen
+        https_trigger_security_level: secure_always
     - name: Post status to Zulip
       if: ${{ always() }}
       uses: containrrr/shoutrrr-action@v1

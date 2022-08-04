@@ -1,5 +1,13 @@
-on: push
 name: Docker build
+
+on:
+  push:
+    paths-ignore:
+      - 'webhook/**'
+
+permissions:
+  contents: read
+
 jobs:
   build:
     name: Docker build
