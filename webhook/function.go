@@ -11,7 +11,8 @@ import (
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/containrrr/shoutrrr/pkg/types"
-	"github.com/rickar/cal"
+	"github.com/rickar/cal/v2"
+	"github.com/rickar/cal/v2/dk"
 	"gopkg.in/go-playground/webhooks.v5/github"
 )
 
@@ -141,14 +142,24 @@ func withinWorkingHours() bool {
 	return true
 }
 
-func workCalendar() *cal.Calendar {
-	c := cal.NewCalendar()
+func workCalendar() *cal.BusinessCalendar {
+	c := cal.NewBusinessCalendar()
 
-	cal.AddDanishHolidays(c)
-	c.AddHoliday(
-		cal.DKJuleaften,
-		cal.DKNytaarsaften,
-	)
+	c.AddHoliday(dk.Holidays...)
+
+	//nolint:exhaustivestruct
+	c.AddHoliday(&cal.Holiday{
+		Month: time.December,
+		Day:   24, //nolint:gomnd
+		Func:  cal.CalcDayOfMonth,
+	})
+
+	//nolint:exhaustivestruct
+	c.AddHoliday(&cal.Holiday{
+		Month: time.December,
+		Day:   31, //nolint:gomnd
+		Func:  cal.CalcDayOfMonth,
+	})
 
 	return c
 }
