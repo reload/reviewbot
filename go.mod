@@ -5,7 +5,7 @@ go 1.19
 require (
 	github.com/containrrr/shoutrrr v0.6.1
 	github.com/martinusso/inflect v0.0.0-20161215184957-e234d1ee70de
-	github.com/rickar/cal/v2 v2.1.6
+	github.com/rickar/cal/v2 v2.1.7
 	github.com/robfig/cron v1.2.0
 	github.com/shurcooL/githubv4 v0.0.0-20220520033151-0b4e3294ff00
 	golang.org/x/oauth2 v0.0.0-20220722155238-128564f6959c
