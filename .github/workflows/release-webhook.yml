@@ -21,7 +21,7 @@ jobs:
         working-directory: webhook
     - run: echo ::set-output name=go-runtime::$(echo -n go${{ steps.version.outputs.go-mod-version }} | tr -d '.')
       id: runtime
-    - uses: google-github-actions/auth@v0
+    - uses: google-github-actions/auth@v1
       with:
         credentials_json: '${{ secrets.GCLOUD_AUTH }}'
     - uses: google-github-actions/deploy-cloud-functions@v0
