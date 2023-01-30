@@ -3,7 +3,7 @@ module github.com/reload/reviewbot
 go 1.19
 
 require (
-	github.com/containrrr/shoutrrr v0.7.0
+	github.com/containrrr/shoutrrr v0.7.1
 	github.com/martinusso/inflect v0.0.0-20161215184957-e234d1ee70de
 	github.com/rickar/cal/v2 v2.1.10
 	github.com/robfig/cron v1.2.0
