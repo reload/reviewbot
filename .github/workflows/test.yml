@@ -20,7 +20,7 @@ jobs:
       with:
         working-directory: webhook
     - name: Setup Go ${{ steps.version.outputs.go-mod-version }}.x
-      uses: WillAbides/setup-go-faster@v1.9.0
+      uses: WillAbides/setup-go-faster@v1.9.1
       with:
         go-version: ${{ steps.version.outputs.go-mod-version }}.x
         ignore-local: true
