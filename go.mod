@@ -3,7 +3,7 @@ module github.com/reload/reviewbot
 go 1.19
 
 require (
-	github.com/containrrr/shoutrrr v0.7.1
+	github.com/containrrr/shoutrrr v0.8.0
 	github.com/martinusso/inflect v0.0.0-20161215184957-e234d1ee70de
 	github.com/rickar/cal/v2 v2.1.13
 	github.com/robfig/cron v1.2.0
@@ -12,7 +12,7 @@ require (
 )
 
 require (
-	github.com/fatih/color v1.14.1 // indirect
+	github.com/fatih/color v1.15.0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/mattn/go-colorable v0.1.13 // indirect
 	github.com/mattn/go-isatty v0.0.17 // indirect
