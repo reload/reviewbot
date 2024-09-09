@@ -5,7 +5,7 @@ go 1.22
 require (
 	github.com/containrrr/shoutrrr v0.8.0
 	github.com/martinusso/inflect v0.0.0-20161215184957-e234d1ee70de
-	github.com/rickar/cal/v2 v2.1.18
+	github.com/rickar/cal/v2 v2.1.19
 	github.com/robfig/cron v1.2.0
 	github.com/shurcooL/githubv4 v0.0.0-20240120211514-18a1ae0e79dc
 	golang.org/x/oauth2 v0.23.0
