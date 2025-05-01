@@ -19,7 +19,7 @@ jobs:
       id: version
       with:
         working-directory: webhook
-    - run: echo ::set-output name=go-runtime::$(echo -n go${{ steps.version.outputs.go-mod-version }} | tr -d '.')
+    - run: echo ::set-output name=go-runtime::$(echo -n go${{ steps.version.outputs.go-mod-version }} | cut -d . -f 1-2 | tr -d '.')
       id: runtime
     - uses: google-github-actions/auth@v2
       with:
