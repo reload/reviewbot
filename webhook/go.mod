@@ -1,6 +1,6 @@
 module github.com/reload/reviewbot/webhook
 
-go 1.22.12
+go 1.21.13
 
 require (
 	github.com/containrrr/shoutrrr v0.8.0
