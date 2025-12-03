@@ -1,3 +1,4 @@
+---
 name: Build and test
 
 on:
@@ -12,20 +13,13 @@ permissions:
 jobs:
   build_and_test:
     name: Build and test
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v6
-    - uses: arnested/go-version-action@v1
-      id: version
-      with:
+      - uses: actions/checkout@v6
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: webhook/go.mod
+      - name: go test
         working-directory: webhook
-    - name: Setup Go ${{ steps.version.outputs.go-mod-version }}
-      uses: WillAbides/setup-go-faster@v1.14.0
-      with:
-        go-version: ${{ steps.version.outputs.go-mod-version }}
-        ignore-local: true
-    - name: go test
-      working-directory: webhook
-      env:
-        GO111MODULE: 'on'
-      run: go test --verbose -race -cover -covermode=atomic ./...
+        run: go test --verbose -race -cover -covermode=atomic ./...
