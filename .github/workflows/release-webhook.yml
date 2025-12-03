@@ -1,3 +1,4 @@
+---
 name: Release Webhook
 on:
   workflow_run:
@@ -12,33 +13,33 @@ permissions:
 
 jobs:
   release:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
     steps:
-    - uses: actions/checkout@v6
-    - uses: arnested/go-version-action@v1
-      id: version
-      with:
-        working-directory: webhook
-    - run: echo ::set-output name=go-runtime::$(echo -n go${{ steps.version.outputs.go-mod-version }} | cut -d . -f 1-2 | tr -d '.')
-      id: runtime
-    - uses: google-github-actions/auth@v3
-      with:
-        credentials_json: '${{ secrets.GCLOUD_AUTH }}'
-    - uses: google-github-actions/deploy-cloud-functions@v2
-      with:
-        source_dir: ./webhook/
-        name: ${{ secrets.CF_NAME }}
-        region: ${{ secrets.CF_REGION }}
-        project_id: ${{ secrets.CF_PROJECT }}
-        runtime: ${{ steps.runtime.outputs.go-runtime }}
-        entry_point: "Handle"
-        env_vars: GITHUB_SECRET=${{ secrets.SHARED_SECRET }},GITHUB_TEAM_SLUG=${{ secrets.TEAM_SLUG }},NOTIFY=${{ secrets.NOTIFY }},TZ=Europe/Copenhagen
-        description: ${{ github.repository }}
-        https_trigger_security_level: secure_always
-        memory_mb: 128
-    - name: Post status to Zulip
-      if: ${{ always() }}
-      uses: containrrr/shoutrrr-action@v1
-      with:
-        url: "${{ secrets.ZULIP_SHOUTRRR_URL }}?stream=logs&topic=reviewbot"
-        message: "Deployed `${{ github.repository }}`@`${{ github.sha }}` to Google Cloud Function `${{ secrets.CF_NAME }}`@`${{ secrets.CF_PROJECT }}`: **${{ job.status }}**."
+      - uses: actions/checkout@v6
+      - uses: arnested/go-version-action@v1
+        id: version
+        with:
+          working-directory: webhook
+      - run: echo go-runtime="$(echo -n go${{ steps.version.outputs.go-mod-version }} | cut -d . -f 1-2 | tr -d '.')" >> "${GITHUB_OUTPUT}"
+        id: runtime
+      - uses: google-github-actions/auth@v3
+        with:
+          credentials_json: '${{ secrets.GCLOUD_AUTH }}'
+      - uses: google-github-actions/deploy-cloud-functions@v2
+        with:
+          source_dir: ./webhook/
+          name: ${{ secrets.CF_NAME }}
+          region: ${{ secrets.CF_REGION }}
+          project_id: ${{ secrets.CF_PROJECT }}
+          runtime: ${{ steps.runtime.outputs.go-runtime }}
+          entry_point: "Handle"
+          env_vars: GITHUB_SECRET=${{ secrets.SHARED_SECRET }},GITHUB_TEAM_SLUG=${{ secrets.TEAM_SLUG }},NOTIFY=${{ secrets.NOTIFY }},TZ=Europe/Copenhagen
+          description: ${{ github.repository }}
+          https_trigger_security_level: secure_always
+          memory_mb: 128
+      - name: Post status to Zulip
+        if: ${{ always() }}
+        uses: containrrr/shoutrrr-action@v1
+        with:
+          url: "${{ secrets.ZULIP_SHOUTRRR_URL }}?stream=logs&topic=reviewbot"
+          message: "Deployed `${{ github.repository }}`@`${{ github.sha }}` to Google Cloud Function `${{ secrets.CF_NAME }}`@`${{ secrets.CF_PROJECT }}`: **${{ job.status }}**."
