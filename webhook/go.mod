@@ -1,5 +1,6 @@
 module github.com/reload/reviewbot/webhook
 
+// Don't bump above 1.21 - it's unsupported by Google Cloud Functions gen 1
 go 1.21.13
 
 require (
