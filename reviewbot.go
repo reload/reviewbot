@@ -5,12 +5,14 @@ import (
 	"os"
 	"strings"
 	"time"
+	_ "time/tzdata"
 
 	"github.com/containrrr/shoutrrr"
 	"github.com/containrrr/shoutrrr/pkg/types"
 	"github.com/rickar/cal/v2"
 	"github.com/rickar/cal/v2/dk"
 	"github.com/robfig/cron"
+	_ "golang.org/x/crypto/x509roots/fallback"
 )
 
 func main() {

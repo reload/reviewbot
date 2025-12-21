@@ -17,8 +17,6 @@ FROM scratch
 
 ENV PATH=/
 
-COPY --from=build-env /usr/local/go/lib/time/zoneinfo.zip /usr/local/go/lib/time/zoneinfo.zip
-COPY --from=build-env /etc/ssl/certs/ /etc/ssl/certs/
 COPY --from=build-env /build/reviewbot /reviewbot
 
 ENTRYPOINT ["reviewbot"]
