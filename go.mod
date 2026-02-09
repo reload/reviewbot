@@ -9,7 +9,7 @@ require (
 	github.com/robfig/cron v1.2.0
 	github.com/shurcooL/githubv4 v0.0.0-20240120211514-18a1ae0e79dc
 	golang.org/x/crypto/x509roots/fallback v0.0.0-20251210140736-7dacc380ba00
-	golang.org/x/oauth2 v0.34.0
+	golang.org/x/oauth2 v0.35.0
 )
 
 require (
