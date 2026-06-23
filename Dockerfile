@@ -19,4 +19,6 @@ ENV PATH=/
 
 COPY --from=build-env /build/reviewbot /reviewbot
 
+USER 65532:65532
+
 ENTRYPOINT ["reviewbot"]
