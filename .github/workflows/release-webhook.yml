@@ -39,7 +39,7 @@ jobs:
           memory_mb: 128
       - name: Post status to Zulip
         if: ${{ always() }}
-        uses: containrrr/shoutrrr-action@v1.0.106
+        uses: containrrr/shoutrrr-action@v1.0.109
         with:
           url: "${{ secrets.ZULIP_SHOUTRRR_URL }}?stream=logs&topic=reviewbot"
           message: "Deployed `${{ github.repository }}`@`${{ github.sha }}` to Google Cloud Function `${{ secrets.CF_NAME }}`@`${{ secrets.CF_PROJECT }}`: **${{ job.status }}**."
