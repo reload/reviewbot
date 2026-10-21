@@ -1,6 +1,6 @@
 module github.com/reload/reviewbot
 
-go 1.26.0
+go 1.27.3
 
 require (
 	github.com/containrrr/shoutrrr v0.8.0
